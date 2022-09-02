@@ -65,6 +65,16 @@ pub fn query(
             df.hstack(&columns).unwrap()
         })))
         .build();
+    
+    // GROUP BY Aggregate Node
+    let mut sum_accumulator = SumAccumulator::new();
+    sum_accumulator
+        .set_aggregates(vec![
+            ("revenue".into(), vec!["sum".into()]),
+        ]);
+    let groupby_node = AccumulatorNode::<DataFrame, SumAccumulator>::new()
+        .accumulator(sum_accumulator)
+        .build();
 
     // SELECT Node
     let select_node = AppenderNode::<DataFrame, MapAppender>::new()
@@ -80,7 +90,8 @@ pub fn query(
     // Connect nodes with subscription
     where_node.subscribe_to_node(&lineitem_csvreader_node, 0);
     expression_node.subscribe_to_node(&where_node, 0);
-    select_node.subscribe_to_node(&expression_node, 0);
+    groupby_node.subscribe_to_node(&expression_node, 0);
+    select_node.subscribe_to_node(&groupby_node, 0);
 
     // Output reader subscribe to output node.
     output_reader.subscribe_to_node(&select_node, 0);
@@ -88,6 +99,7 @@ pub fn query(
     // Add all the nodes to the service
     let mut service = ExecutionService::<polars::prelude::DataFrame>::create();
     service.add(select_node);
+    service.add(groupby_node);
     service.add(expression_node);
     service.add(where_node);
     service.add(lineitem_csvreader_node);
