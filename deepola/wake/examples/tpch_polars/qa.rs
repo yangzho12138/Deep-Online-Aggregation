@@ -66,12 +66,8 @@ pub fn query(
         })))
         .build();
     
-    // GROUP BY Aggregate Node
+    // Aggregate Node
     let mut sum_accumulator = SumAccumulator::new();
-    sum_accumulator
-        .set_aggregates(vec![
-            ("revenue".into(), vec!["sum".into()]),
-        ]);
     let groupby_node = AccumulatorNode::<DataFrame, SumAccumulator>::new()
         .accumulator(sum_accumulator)
         .build();
@@ -80,7 +76,7 @@ pub fn query(
     let select_node = AppenderNode::<DataFrame, MapAppender>::new()
         .appender(MapAppender::new(Box::new(|df: &DataFrame| {
         let columns = vec![
-            Series::new("revenue", df.column("revenue_sum").unwrap()),
+            Series::new("revenue", df.column("revenue").unwrap()),
         ];
         DataFrame::new(columns)
             .unwrap()
