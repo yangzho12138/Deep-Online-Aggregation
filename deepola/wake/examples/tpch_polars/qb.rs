@@ -72,7 +72,7 @@ pub fn query(
         .build();
     
     // Aggregate Node
-    let mut sum_accumulator = SumAccumulator::new();
+    let sum_accumulator = SumAccumulator::new();
     sum_accumulator
         .set_group_key(vec!["c_name".to_string()])
         .set_aggregates(vec![
@@ -91,6 +91,8 @@ pub fn query(
             Series::new("o_totalprice_sum", df.column("o_totalprice").unwrap()),
         ];
         DataFrame::new(columns)
+            .unwrap()
+            .sort(&["o_totalprice_sum"], vec![true])
             .unwrap()
         })))
         .build();
