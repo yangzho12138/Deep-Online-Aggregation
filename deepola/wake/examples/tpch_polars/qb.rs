@@ -59,7 +59,7 @@ pub fn query(
     let where_node = AppenderNode::<DataFrame, MapAppender>::new()
         .appender(MapAppender::new(Box::new(|df: &DataFrame| {
             let a = df.column("c_mktsegment").unwrap();
-            let mask = a.eq("AUTOMOBILE").unwrap();
+            let mask = a.eq("AUTOMOBILE");
             let result = df.filter(&mask).unwrap();
             result
         })))
