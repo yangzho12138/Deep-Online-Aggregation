@@ -49,7 +49,7 @@ pub fn query(
     let table_columns = HashMap::from([
         (
             "lineitem".into(),
-            vec!["l_partkey", "l_shipinstruct", "l_quantity", "l_discount"],
+            vec!["l_partkey", "l_shipinstruct", "l_extendedprice", "l_quantity", "l_discount"],
         ),
         ("part".into(), vec!["p_partkey", "p_brand", "p_size"]),
     ]);
@@ -72,18 +72,18 @@ pub fn query(
 
     // HASH JOIN Node
     let lp_hash_join_node = HashJoinBuilder::new()
-        .left_on(vec!["p_partkey".into()])
-        .right_on(vec!["l_partkey".into()])
+        .left_on(vec!["l_partkey".into()])
+        .right_on(vec!["p_partkey".into()])
         .build();
     
     let lp_where_node = AppenderNode::<DataFrame, MapAppender>::new()
         .appender(MapAppender::new(Box::new(|df: &DataFrame| {
             let pb = df.column("p_brand").unwrap();
             let lq = df.column("l_quantity").unwrap();
-            let ps = df.column("p_size").unwrap();
-            let mask1 = pb.equal("Brand#12").unwrap() & lq.gt_eq("1").unwrap() & lq.lt_eq("11").unwrap() & ps.gt_eq("1").unwrap() & ps.lt_eq("5").unwrap();
-            let mask2 = pb.equal("Brand#23").unwrap() & lq.gt_eq("10").unwrap() & lq.lt_eq("20").unwrap() & ps.gt_eq("1").unwrap() & ps.lt_eq("10").unwrap();
-            let mask3 = pb.equal("Brand#34").unwrap() & lq.gt_eq("20").unwrap() & lq.lt_eq("30").unwrap() & ps.gt_eq("1").unwrap() & ps.lt_eq("15").unwrap();
+            let ps = df.column("p_size").unwrap(); 
+            let mask1 = pb.equal("Brand#12").unwrap() & lq.gt_eq(1).unwrap() & lq.lt_eq(11).unwrap() & ps.gt_eq(1).unwrap() & ps.lt_eq(5).unwrap();
+            let mask2 = pb.equal("Brand#23").unwrap() & lq.gt_eq(10).unwrap() & lq.lt_eq(20).unwrap() & ps.gt_eq(1).unwrap() & ps.lt_eq(10).unwrap();
+            let mask3 = pb.equal("Brand#34").unwrap() & lq.gt_eq(20).unwrap() & lq.lt_eq(30).unwrap() & ps.gt_eq(1).unwrap() & ps.lt_eq(15).unwrap();
             let result1 = df.filter(&mask1).unwrap();
             let result2 = df.filter(&mask2).unwrap();
             let result3 = df.filter(&mask3).unwrap();
