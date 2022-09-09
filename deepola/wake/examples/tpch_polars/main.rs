@@ -11,8 +11,8 @@ mod q1;
 mod q14;
 mod qa;
 mod qb;
-// mod qc;
-// mod qd;
+mod qc;
+mod qd;
 mod tests;
 mod utils;
 
@@ -73,8 +73,8 @@ pub fn get_query_service(
         "q14" => q14::query(table_input, output_reader),
         "qa" => qa::query(table_input, output_reader),
         "qb" => qb::query(table_input, output_reader),
-        // "qc" => qc::query(table_input, output_reader),
-        // "qd" => qd::query(table_input, output_reader),
+        "qc" => qc::query(table_input, output_reader),
+        "qd" => qd::query(table_input, output_reader),
         _ => panic!("Invalid Query Parameter"),
     };
     query_service
