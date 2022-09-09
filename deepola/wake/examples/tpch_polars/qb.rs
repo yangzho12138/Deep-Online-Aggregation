@@ -33,8 +33,7 @@ pub fn query(
     output_reader: &mut NodeReader<polars::prelude::DataFrame>,
 ) -> ExecutionService<polars::prelude::DataFrame>{
     // Create a HashMap that stores table name and the columns in that query
-    let table_columns = HashMap::from([
-        (
+    let table_columns = HashMap::from([(
           "orders".into(),
           vec![
               "o_totalprice",
@@ -67,28 +66,29 @@ pub fn query(
     
     // HASH JOIN Node
     let hash_join_node = HashJoinBuilder::new()
-        .left_on(vec!["o_custkey".into()])
-        .right_on(vec!["c_custkey".into()])
+        .left_on(vec!["c_custkey".into()])
+        .right_on(vec!["o_custkey".into()])
         .build();
-    
+
     // Aggregate Node
-    let sum_accumulator = SumAccumulator::new();
+    let mut sum_accumulator = SumAccumulator::new();
     sum_accumulator
         .set_group_key(vec!["c_name".to_string()])
         .set_aggregates(vec![
-            ("o_totalprice".into(), vec!["sum".into(), "count".into()]),
+            ("o_totalprice".into(), vec!["sum".into()]),
         ]);
 
     let groupby_node = AccumulatorNode::<DataFrame, SumAccumulator>::new()
         .accumulator(sum_accumulator)
         .build();
+
     
     // SELECT Node
     let select_node = AppenderNode::<DataFrame, MapAppender>::new()
         .appender(MapAppender::new(Box::new(|df: &DataFrame| {
         let columns = vec![
             Series::new("c_name", df.column("c_name").unwrap()),
-            Series::new("o_totalprice_sum", df.column("o_totalprice").unwrap()),
+            Series::new("o_totalprice_sum", df.column("o_totalprice_sum").unwrap()),
         ];
         DataFrame::new(columns)
             .unwrap()
@@ -98,9 +98,9 @@ pub fn query(
         .build();
     
     // Connect nodes with subscription
-    where_node.subscribe_to_node(&orders_csvreader_node, 0);
+    where_node.subscribe_to_node(&customer_csvreader_node, 0);
     hash_join_node.subscribe_to_node(&where_node, 0); // Left Node
-    hash_join_node.subscribe_to_node(&customer_csvreader_node, 1); // Right Node
+    hash_join_node.subscribe_to_node(&orders_csvreader_node, 1); // Right Node
     groupby_node.subscribe_to_node(&hash_join_node, 0);
     select_node.subscribe_to_node(&groupby_node, 0);
     
@@ -109,11 +109,11 @@ pub fn query(
     
     // Add all the nodes to the service
     let mut service = ExecutionService::<polars::prelude::DataFrame>::create();
-    service.add(select_node);
-    service.add(hash_join_node);
-    service.add(groupby_node);
+    service.add(customer_csvreader_node);
     service.add(where_node);
     service.add(orders_csvreader_node);
-    service.add(customer_csvreader_node);
+    service.add(hash_join_node);
+    service.add(groupby_node);
+    service.add(select_node);
     service
 }
