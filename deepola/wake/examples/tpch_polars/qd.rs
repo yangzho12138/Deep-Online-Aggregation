@@ -72,8 +72,8 @@ pub fn query(
 
     // HASH JOIN Node
     let lp_hash_join_node = HashJoinBuilder::new()
-        .left_on(vec!["l_partkey".into()])
-        .right_on(vec!["p_partkey".into()])
+        .left_on(vec!["p_partkey".into()])
+        .right_on(vec!["l_partkey".into()])
         .build();
     
     let lp_where_node = AppenderNode::<DataFrame, MapAppender>::new()
@@ -83,8 +83,7 @@ pub fn query(
             let ps = df.column("p_size").unwrap();
             let mask1 = pb.equal("Brand#12").unwrap() & lq.gt_eq("1").unwrap() & lq.lt_eq("11").unwrap() & ps.gt_eq("1").unwrap() & ps.lt_eq("5").unwrap();
             let mask2 = pb.equal("Brand#23").unwrap() & lq.gt_eq("10").unwrap() & lq.lt_eq("20").unwrap() & ps.gt_eq("1").unwrap() & ps.lt_eq("10").unwrap();
-            let mask3 = pb.equal("Brand#34").unwrap() & lq.gt_eq("20").unwrap() & lq.lt_eq("40").unwrap() & ps.gt_eq("1").unwrap() & ps.lt_eq("15").unwrap();
-            // let result1 = df.filter(&mask1).vstack_mut(&df.filter(&mask2).unwrap()).vstack_mut(&df.filter(&mask3).unwrap()).unwrap();
+            let mask3 = pb.equal("Brand#34").unwrap() & lq.gt_eq("20").unwrap() & lq.lt_eq("30").unwrap() & ps.gt_eq("1").unwrap() & ps.lt_eq("15").unwrap();
             let result1 = df.filter(&mask1).unwrap();
             let result2 = df.filter(&mask2).unwrap();
             let result3 = df.filter(&mask3).unwrap();
@@ -113,7 +112,7 @@ pub fn query(
         .build();
 
     // GROUP BY AGGREGATE Node
-    let mut sum_accumulator = SumAccumulator::new();
+    let sum_accumulator = SumAccumulator::new();
     
     let groupby_node = AccumulatorNode::<DataFrame, SumAccumulator>::new()
         .accumulator(sum_accumulator)
@@ -147,8 +146,8 @@ pub fn query(
     service.add(lineitem_csvreader_node);
     service.add(part_csvreader_node);
     service.add(lineitem_where_node);
-    service.add(lp_where_node);
     service.add(lp_hash_join_node);
+    service.add(lp_where_node);
     service.add(expression_node);
     service.add(groupby_node);
     service.add(select_node);
