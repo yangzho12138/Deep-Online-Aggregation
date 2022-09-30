@@ -22,7 +22,6 @@ name = "tpch_polars"
 # to `use tpch_polars;` unless the "rlib" or "lib" crate type is also included, e.g.:
 crate-type = ["cdylib", "rlib"]
 
-
 [dependencies]
 wake = { path = "../../../wake" }
 pyo3 = { version = "~0.17", features = ["extension-module"] }
