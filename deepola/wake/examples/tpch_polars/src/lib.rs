@@ -1,6 +1,7 @@
 use myiter::Mydata;
 use pyo3::prelude::*;
 use polars::prelude::DataFrame;
+use utils::run_my_query;
 use crate::tpch::q1::query;
 use wake::graph::ExecutionService;
 use wake::graph::*;
@@ -18,13 +19,13 @@ fn run_thread(
     scale: usize,
     data_directory: &str,
 ) -> PyResult<Mydata> {
-    let (sender, receiver) = mpsc::channel::<String>();
+    let (mut sender, receiver) = mpsc::channel::<String>();
     let res_r = Mydata { iter: receiver };
     let mut output_reader = NodeReader::empty();
-    let qService = get_query_service(query_no, scale, data_directory, &mut output_reader);
+    let mut qService = get_query_service(query_no, scale, data_directory, &mut output_reader);
 
     thread::spawn(move || {
-        sender.send(run_query(&mut qService, &mut output_reader)).unwrap();
+        run_my_query(&mut qService, &mut output_reader, &mut sender);
     });
 
     Ok(res_r)
