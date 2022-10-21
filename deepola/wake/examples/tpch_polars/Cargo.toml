@@ -29,7 +29,11 @@ itertools = "0.10"
 log = "0.4.14"
 jemallocator = "0.3.2"
 glob = "0.3.0"
+<<<<<<< HEAD
 polars = {version="0.23.2", features = ["serde"]}
+=======
+polars = { version = "0.23.2", features = ["parquet"] }
+>>>>>>> 511-origin/cs511-project-3
 alphanumeric-sort = "1.4.4"
 serde_json = "1.0.85"
 env_logger = "0.9.0"
