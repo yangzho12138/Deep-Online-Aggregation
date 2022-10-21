@@ -9,13 +9,10 @@ use std::error::Error;
 use std::sync::mpsc::Sender;
 use std::time::Instant;
 
-<<<<<<< HEAD
 use crate::myiter::Mydata;
-=======
 pub const FILE_FORMAT_CSV: &str = ".tbl";
 pub const FILE_FORMAT_PARQUET: &str = ".parquet";
 pub const FILE_FORMAT_DEFAULT: &str = FILE_FORMAT_PARQUET;
->>>>>>> 511-origin/cs511-project-3
 
 #[derive(Debug)]
 pub struct TableInput {
