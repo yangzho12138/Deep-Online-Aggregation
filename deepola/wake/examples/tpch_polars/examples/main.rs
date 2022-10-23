@@ -17,11 +17,13 @@ fn main() {
     // 2: Scale of the TPC-H Dataset. Optional. Default: 1.
     // 3: Directory containing the dataset. Optional. Default: resources/tpc-h/data/scale=1/partition=1/
     
-    log::info!("Main Starts: {:?}", SystemTime::now());
+    // log::info!("Main Starts: {:?}", SystemTime::now());
 
     env_logger::Builder::from_default_env()
         .format_timestamp_micros()
         .init();
+
+    log::info!("Main Starts: {:?}", SystemTime::now());
 
     let args = env::args().skip(1).collect::<Vec<String>>();
     match args[0].as_str() {
