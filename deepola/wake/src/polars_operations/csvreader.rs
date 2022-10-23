@@ -4,6 +4,7 @@ use polars::prelude::*;
 use crate::data::*;
 use crate::graph::ExecutionNode;
 use crate::processor::StreamProcessor;
+use std::time::SystemTime;
 
 pub struct CSVReaderBuilder {
     delimiter: char,
@@ -85,6 +86,8 @@ impl CSVReader {
     }
 
     fn dataframe_from_filename(&self, filename: &str) -> DataFrame {
+        log::info!("Begin ReadFile CSV: {:?}", SystemTime::now());
+
         let mut reader = polars::prelude::CsvReader::from_path(filename)
             .unwrap()
             .has_header(self.has_headers)
@@ -93,6 +96,9 @@ impl CSVReader {
             reader = reader.with_projection(self.projected_cols.clone());
         }
         let mut df = reader.finish().unwrap();
+        
+        log::info!("Ene ReadFile CSV: {:?}", SystemTime::now());
+
         if self.column_names.is_some() {
             if let Some(a) = &self.column_names {
                 df.set_column_names(a).unwrap();

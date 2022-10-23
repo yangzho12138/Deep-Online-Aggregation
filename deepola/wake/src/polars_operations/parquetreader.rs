@@ -5,6 +5,7 @@ use polars::prelude::*;
 use crate::data::*;
 use crate::graph::ExecutionNode;
 use crate::processor::StreamProcessor;
+use std::time::SystemTime;
 
 pub struct ParquetReaderBuilder {
     column_names: Option<Vec<String>>,
@@ -66,12 +67,17 @@ impl ParquetReader {
     fn dataframe_from_filename(&self, filename: &str) -> DataFrame {
         /* TODO: NEED TO IMPLEMENT THIS */
         /* Refer to the implementation of `dataframe_from_filename` in `csvreader.rs` */
+        log::info!("Begin ReadFile Parquet: {:?}", SystemTime::now());
+
         let f = File::open(filename).unwrap();
         let mut reader = polars::prelude::ParquetReader::new(f);
         if self.projected_cols.is_some() {
             reader = reader.with_projection(self.projected_cols.clone());
         }
         let mut df = reader.finish().unwrap();
+
+        log::info!("End ReadFile Parquet: {:?}", SystemTime::now());
+
         if self.column_names.is_some(){
             if let Some(a) = &self.column_names{
                 df.set_column_names(a).unwrap();

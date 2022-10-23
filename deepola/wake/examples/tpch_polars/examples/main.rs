@@ -8,6 +8,7 @@ use wake::graph::*;
 
 use tpch_polars::tpch::*;
 use tpch_polars::utils;
+use std::time::SystemTime;
 
 fn main() {
     // Arguments:
@@ -15,6 +16,8 @@ fn main() {
     // 1: Query Number. Required.
     // 2: Scale of the TPC-H Dataset. Optional. Default: 1.
     // 3: Directory containing the dataset. Optional. Default: resources/tpc-h/data/scale=1/partition=1/
+    
+    log::info!("Main Starts: {:?}", SystemTime::now());
 
     env_logger::Builder::from_default_env()
         .format_timestamp_micros()
@@ -29,6 +32,8 @@ fn main() {
         Run `cargo run --release --example tpch_polars -- test` to run test for query q1."
         ),
     }
+
+    log::info!("Main Ends: {:?}", SystemTime::now());
 }
 
 fn run_query(args: Vec<String>) {
@@ -63,10 +68,10 @@ pub fn get_query_service(
     let query_service = match query_no {
         "q1" => q1::query(table_input, output_reader),
         "q14" => q14::query(table_input, output_reader),
-        // "qa" => qa::query(table_input, output_reader),
-        // "qb" => qb::query(table_input, output_reader),
-        // "qc" => qc::query(table_input, output_reader),
-        // "qd" => qd::query(table_input, output_reader),
+        "qa" => qa::query(table_input, output_reader),
+        "qb" => qb::query(table_input, output_reader),
+        "qc" => qc::query(table_input, output_reader),
+        "qd" => qd::query(table_input, output_reader),
         _ => panic!("Invalid Query Parameter"),
     };
     query_service
