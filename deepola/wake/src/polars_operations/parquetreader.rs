@@ -68,6 +68,7 @@ impl ParquetReader {
         /* TODO: NEED TO IMPLEMENT THIS */
         /* Refer to the implementation of `dataframe_from_filename` in `csvreader.rs` */
         log::info!("Begin ReadFile Parquet: {:?}", SystemTime::now());
+        println!("{:?}",SystemTime::now());
 
         let f = File::open(filename).unwrap();
         let mut reader = polars::prelude::ParquetReader::new(f);
@@ -77,6 +78,7 @@ impl ParquetReader {
         let mut df = reader.finish().unwrap();
 
         log::info!("End ReadFile Parquet: {:?}", SystemTime::now());
+        println!("{:?}",SystemTime::now());
 
         if self.column_names.is_some(){
             if let Some(a) = &self.column_names{

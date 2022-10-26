@@ -87,6 +87,7 @@ impl CSVReader {
 
     fn dataframe_from_filename(&self, filename: &str) -> DataFrame {
         log::info!("Begin ReadFile CSV: {:?}", SystemTime::now());
+        println!("{:?}",SystemTime::now());
 
         let mut reader = polars::prelude::CsvReader::from_path(filename)
             .unwrap()
@@ -97,7 +98,8 @@ impl CSVReader {
         }
         let mut df = reader.finish().unwrap();
         
-        log::info!("Ene ReadFile CSV: {:?}", SystemTime::now());
+        log::info!("End ReadFile CSV: {:?}", SystemTime::now());
+        println!("{:?}",SystemTime::now());
 
         if self.column_names.is_some() {
             if let Some(a) = &self.column_names {

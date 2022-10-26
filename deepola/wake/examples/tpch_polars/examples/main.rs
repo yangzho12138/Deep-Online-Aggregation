@@ -24,6 +24,7 @@ fn main() {
         .init();
 
     log::info!("Main Starts: {:?}", SystemTime::now());
+    //println!("{:?}",SystemTime::now());
 
     let args = env::args().skip(1).collect::<Vec<String>>();
     match args[0].as_str() {
@@ -36,6 +37,7 @@ fn main() {
     }
 
     log::info!("Main Ends: {:?}", SystemTime::now());
+    //println!("{:?}",SystemTime::now());
 }
 
 fn run_query(args: Vec<String>) {
