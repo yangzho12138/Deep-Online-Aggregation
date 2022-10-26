@@ -1,7 +1,7 @@
 use myiter::Mydata;
 use pyo3::prelude::*;
 use polars::prelude::DataFrame;
-// use utils::run_my_query;
+use utils::run_my_query;
 use crate::tpch::q1::query;
 use wake::graph::ExecutionService;
 use wake::graph::*;
@@ -25,7 +25,7 @@ fn run_thread(
     let mut qService = get_query_service(query_no, scale, data_directory, &mut output_reader);
 
     thread::spawn(move || {
-        run_query(&mut qService, &mut output_reader);
+        run_my_query(&mut qService, &mut output_reader, &mut sender);
     });
 
     Ok(res_r)
