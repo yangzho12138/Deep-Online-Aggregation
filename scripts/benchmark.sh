@@ -27,7 +27,7 @@ do
         		beginTime=`date +%s%N`
         		RUST_LOG=info cargo run --release --no-default-features --example main -- query ${q[m]} 10 \../../resources/tpc-h/data/scale=1/partition=10/${type[n]}/ | tee log.txt
         		endTime=`date +%s%N`
-        		echo query time: $(($endTime-$beginTime))
+        		#echo query time: $(($endTime-$beginTime))
 			query[j]=$(($endTime-$beginTime))
 
         		# deal with the log document
@@ -57,7 +57,7 @@ do
                 		#echo $i                
         		done
         		#echo $sumS + $sumNS
-        		echo file read time: $((sumS*1000000000+sumNS))
+        		#echo file read time: $((sumS*1000000000+sumNS))
 			fileRead[j]=$((sumS*1000000000+sumNS))
 		done
 		# calculate the mean and std
@@ -65,30 +65,30 @@ do
 		meansQ[index]=$(($meanSum/5))
 		num=$(((${query[0]}-${meansQ[index]})*(${query[0]}-${meansQ[index]})+(${query[1]}-${meansQ[index]})*(${query[1]}-${meansQ[index]})+(${query[2]}-${meansQ[index]})*(${query[2]}-${meansQ[index]})+(${query[3]}-${meansQ[index]})*(${query[3]}-${meansQ[index]})+(${query[4]}-${meansQ[index]})*(${query[4]}-${meansQ[index]})))
 		num=$(($num/5))
-		echo $num
+		#echo $num
 		stdsQ[index]=$(awk -v x=$num 'BEGIN{printf("%d",sqrt(x))}')
-		echo ${stdsQ[index]}
+		#echo ${stdsQ[index]}
 
 		meanSum=$((${fileRead[0]}+${fileRead[1]}+${fileRead[2]}+${fileRead[3]}+${fileRead[4]}))
 		meansF[index]=$(($meanSum/5))
 		num=$(((${fileRead[0]}-${meansF[index]})*(${fileRead[0]}-${meansF[index]})+(${fileRead[1]}-${meansF[index]})*(${fileRead[1]}-${meansF[index]})+(${fileRead[2]}-${meansF[index]})*(${fileRead[2]}-${meansF[index]})+(${fileRead[3]}-${meansF[index]})*(${fileRead[3]}-${meansF[index]})+(${fileRead[4]}-${meansF[index]})*(${fileRead[4]}-${meansF[index]})))
 		num=$(($num/5))
-		echo $num
+		#echo $num
 		stdsF[index]=$(awk -v x=$num 'BEGIN{printf("%d",sqrt(x))}')
-		echo ${stdsF[index]}
+		#echo ${stdsF[index]}
 		((index++))
 	done
 done
 
-for((i=0;i<12;i++))
-do
-	echo $i
-	echo ${meansQ[i]}
-	echo ${stdsQ[i]}
-	echo ${meansF[i]}
-	echo ${stdsF[i]}
-	echo ------------------
-done
+#for((i=0;i<12;i++))
+#do
+#	echo $i
+#	echo ${meansQ[i]}
+#	echo ${stdsQ[i]}
+#	echo ${meansF[i]}
+#	echo ${stdsF[i]}
+#	echo ------------------
+#done
 
 for((i=0;i<12;i++))
 do
