@@ -13,6 +13,8 @@ use crate::myiter::Mydata;
 pub const FILE_FORMAT_CSV: &str = ".tbl";
 pub const FILE_FORMAT_PARQUET: &str = ".parquet";
 pub const FILE_FORMAT_DEFAULT: &str = FILE_FORMAT_PARQUET;
+// added
+pub const FILE_FORMAT_JSON: &str = ".json";
 
 #[derive(Debug)]
 pub struct TableInput {
@@ -61,6 +63,17 @@ pub fn load_tables(directory: &str, scale: usize) -> HashMap<String, TableInput>
                 Err(e) => println!("{:?}", e),
             }
         }
+
+        // added for json
+        for entry in glob(&format!("{}/{}{FILE_FORMAT_JSON}*", directory, tpch_table))
+            .expect("Failed to read glob pattern")
+        {
+            match entry {
+                Ok(path) => input_files.push(path.to_str().unwrap().to_string()),
+                Err(e) => println!("{:?}", e),
+            }
+        }
+
         // To sort slices correctly taking into account the partition numbers.
         alphanumeric_sort::sort_str_slice(&mut input_files);
         table_input.insert(
@@ -135,8 +148,11 @@ pub fn check_file_format(file_names: &Vec<String>) -> &str {
         let file = file_names.get(0).unwrap();
         if file.contains(FILE_FORMAT_PARQUET) {
             FILE_FORMAT_PARQUET
-        } else {
+        } else if file.contains(FILE_FORMAT_CSV) {
             FILE_FORMAT_CSV
+        } else {
+            // ADDED
+            FILE_FORMAT_JSON
         }
     }
 }
@@ -177,6 +193,10 @@ pub fn build_csv_reader_node(
         FILE_FORMAT_PARQUET => ParquetReaderBuilder::new()
             .column_names(projected_cols_names)
             .projected_cols(projected_cols_index)
+            .build(),
+        FILE_FORMAT_JSON => JsonReaderBuilder::new()
+            .with_projection(projected_cols_names)
+            // .projected_cols(projected_cols_index)
             .build(),
         _ => {
             panic!("Invalid file format specified. Supported formats are tbl and parquet.")

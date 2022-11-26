@@ -14,6 +14,15 @@ def convert_file_to_parquet(file_name):
     df.write_parquet(target_file_name, statistics=True)
     return target_file_name
 
+# potential change for project 4
+def convert_file_to_json(file_name):
+    target_file_name = file_name.replace('tbl','json')
+    if os.path.exists(target_file_name):
+        print(f"File {target_file_name} already exists")
+        return target_file_name
+    df = pl.read_csv(file_name, has_header = False, sep = "|")
+    df.write_json(target_file_name, statistics=True)
+    return target_file_name
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python3 convert_to_parquet.py <input-dir. ex: ../sresources/tpc-h/data/scale=10/partition=10/tbl/>")
