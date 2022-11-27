@@ -164,7 +164,16 @@ pub fn build_csv_reader_node(
     table_columns: &HashMap<String, Vec<&str>>,
 ) -> ExecutionNode<polars::prelude::DataFrame> {
     // Get batch size and file names from tableinput tables;
+    
+    // for (key, value) in tableinput {
+    //     println!("{} : {}", key, value);
+    // }
+    println!("-----input table-------");
     let raw_input_files = tableinput.get(&table as &str).unwrap().input_files.clone();
+    // for ele in &raw_input_files{
+    //     println!("abc {}",ele);
+    // }
+    
     let file_format = check_file_format(&raw_input_files);
     let scale = tableinput.get(&table as &str).unwrap().scale.clone();
     let schema = tpch_schema(&table).unwrap();
@@ -178,11 +187,38 @@ pub fn build_csv_reader_node(
             let col_names = cols_index.iter().map(|x| schema.get_column_from_index(x.clone()).name).collect::<Vec<String>>();
             projected_cols_index = Some(cols_index);
             projected_cols_names = Some(col_names);
+            // for ele in &projected_cols_names{
+            //     for k in ele{
+            //         println!("cols_names {}",k);
+            //     }
+                    
+            // }
+            // for ele in &projected_cols_index{
+            //     for k in ele{
+            //         println!("cols_index {}",k);
+            //     }
+                    
+            // }
         },
         None => {}
     }
+    let mut json_column: Vec<String> = Vec::new();
+    let col = "column_";
+    for ele in &projected_cols_index{
+                for k in ele{
+                    let res = [col,&(k+1).to_string()].join("");
+                    json_column.push(res);
+                    
+                }
+                    
+            }
+    // for s in &json_column{
+    //     println!("{}", s);
+    // }
+    let json_column: Vec<Option<String>> = json_column.into_iter().map(Some).collect();
+    let json_output = json_column.into_iter().collect::<Option<Vec<String>>>();
     let input_files = df!("col" => &raw_input_files).unwrap();
-
+    println!("input_files {}",input_files);
     /* Modify to create TBL reader or PARQUET reader */
     let reader = match file_format {
         FILE_FORMAT_CSV => CSVReaderBuilder::new()
@@ -197,7 +233,7 @@ pub fn build_csv_reader_node(
             .build(),
         FILE_FORMAT_JSON => JsonReaderBuilder::new()
             .column_names(projected_cols_names)
-            .projected_cols(projected_cols_index)
+            .projected_cols(json_output)
             .build(),
         _ => {
             panic!("Invalid file format specified. Supported formats are tbl and parquet.")
