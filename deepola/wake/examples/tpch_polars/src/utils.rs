@@ -12,9 +12,10 @@ use std::time::Instant;
 use crate::myiter::Mydata;
 pub const FILE_FORMAT_CSV: &str = ".tbl";
 pub const FILE_FORMAT_PARQUET: &str = ".parquet";
-pub const FILE_FORMAT_DEFAULT: &str = FILE_FORMAT_PARQUET;
+//pub const FILE_FORMAT_DEFAULT: &str = FILE_FORMAT_PARQUET;
 // added
 pub const FILE_FORMAT_JSON: &str = ".json";
+pub const FILE_FORMAT_DEFAULT: &str = FILE_FORMAT_JSON;
 
 #[derive(Debug)]
 pub struct TableInput {
@@ -196,7 +197,7 @@ pub fn build_csv_reader_node(
             .build(),
         FILE_FORMAT_JSON => JsonReaderBuilder::new()
             .with_projection(projected_cols_names)
-            // .projected_cols(projected_cols_index)
+            .projected_cols(projected_cols_index)
             .build(),
         _ => {
             panic!("Invalid file format specified. Supported formats are tbl and parquet.")

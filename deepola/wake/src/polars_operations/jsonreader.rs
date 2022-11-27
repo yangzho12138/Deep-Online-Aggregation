@@ -8,23 +8,17 @@ use crate::processor::StreamProcessor;
 use std::time::SystemTime;
 
 pub struct JsonReaderBuilder {
-    infer_schema_len: Option<usize>,
-    batch_size: usize,
-    projection: Option<Vec<String>>,
-    // not sure if needed
-    // schema: Option<ArrowSchema>,
-    // json_format: JsonFormat,
+
+    column_names: Option<Vec<String>>,
+    projected_cols: Option<Vec<String>>,
+
 }
 
 impl Default for JsonReaderBuilder {
     fn default() -> Self {
         JsonReaderBuilder {
-            infer_schema_len: Some(3),
-            batch_size: 3,
-            projection: Option::None,
-            // not sure if needed
-            // schema: Option<ArrowSchema>,
-            // json_format: JsonFormat,
+            column_names: Option::None,
+            projected_cols: Option::None,
         }
     }
 }
@@ -40,15 +34,20 @@ impl JsonReaderBuilder {
     // }
 
     // same as column names for other readers
-    pub fn with_projection(&mut self, projection: Option<Vec<usize>>) -> &mut Self {
-        self.projection = projection;
+    pub fn column_names(&mut self, column_names: Option<Vec<String>>) -> &mut Self {
+        self.column_names = column_names;
+        self
+    }
+
+    pub fn projected_cols(&mut self, projected_cols: Option<Vec<String>>) -> &mut Self {
+        self.projected_cols = projected_cols;
         self
     }
 
     pub fn build(&self) -> ExecutionNode<DataFrame> {
         let data_processor = JsonReader::new(
-            self.projection.clone(),
-            // self.projected_cols.clone(),
+            self.column_names.clone(),
+            self.projected_cols.clone(),
         );
         ExecutionNode::<DataFrame>::new(Box::new(data_processor), 1)
     }
