@@ -6,6 +6,9 @@ use crate::data::*;
 use crate::graph::ExecutionNode;
 use crate::processor::StreamProcessor;
 use std::time::SystemTime;
+// added
+use std::fs;
+use std::io::Cursor;
 
 pub struct JsonReaderBuilder {
 
@@ -78,15 +81,34 @@ impl JsonReader {
         /* Refer to the implementation of `dataframe_from_filename` in `csvreader.rs` */
         log::info!("Begin ReadFile Json: {:?}", SystemTime::now());
         println!("{:?}",SystemTime::now());
-
+        // println!("{}",filename);
         let f = File::open(filename).unwrap();
+        let contents = fs::read_to_string(filename).expect("Should have been able to read the file");
+        
+        // let mut contents_cp = r#"{"a":1, "b":2.0, "c":false, "d":"4"}
+        // //! {"a":-10, "b":-3.5, "c":true, "d":"4"}
+        // //! {"a":2, "b":0.6, "c":false, "d":"text"}
+        // //! {"a":1, "b":2.0, "c":false, "d":"4"}
+        // //! {"a":7, "b":-3.5, "c":true, "d":"4"}
+        // //! {"a":1, "b":0.6, "c":false, "d":"text"}
+        // //! {"a":1, "b":2.0, "c":false, "d":"4"}
+        // //! {"a":5, "b":-3.5, "c":true, "d":"4"}
+        // //! {"a":1, "b":0.6, "c":false, "d":"text"}
+        // //! {"a":1, "b":2.0, "c":false, "d":"4"}
+        // //! {"a":1, "b":-3.5, "c":true, "d":"4"}
+        // //! {"a":1, "b":0.6, "c":false, "d":"text"}"#;
+        // println!("{}",contents);
+        let file = Cursor::new(contents);
         let mut reader = polars::prelude::JsonReader::new(f);
+        // println!("--------------df");
         if self.projected_cols.is_some() {
             reader = reader.with_projection(self.projected_cols.clone());
         }
-        let mut df = reader.finish().unwrap();
-
-        log::info!("End ReadFile Parquet: {:?}", SystemTime::now());
+        let mut df = reader
+        .finish()
+        .unwrap();
+       
+        log::info!("End ReadFile Json: {:?}", SystemTime::now());
         println!("{:?}",SystemTime::now());
 
         if self.column_names.is_some(){

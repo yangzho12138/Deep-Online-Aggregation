@@ -71,12 +71,13 @@ impl ParquetReader {
         println!("{:?}",SystemTime::now());
 
         let f = File::open(filename).unwrap();
+        // println!("--------------df {}",f);
         let mut reader = polars::prelude::ParquetReader::new(f);
         if self.projected_cols.is_some() {
             reader = reader.with_projection(self.projected_cols.clone());
         }
         let mut df = reader.finish().unwrap();
-
+        
         log::info!("End ReadFile Parquet: {:?}", SystemTime::now());
         println!("{:?}",SystemTime::now());
 

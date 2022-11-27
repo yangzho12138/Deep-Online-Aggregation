@@ -168,7 +168,7 @@ pub fn build_csv_reader_node(
     // for (key, value) in tableinput {
     //     println!("{} : {}", key, value);
     // }
-    println!("-----input table-------");
+    // println!("-----input table-------");
     let raw_input_files = tableinput.get(&table as &str).unwrap().input_files.clone();
     // for ele in &raw_input_files{
     //     println!("abc {}",ele);
@@ -218,7 +218,7 @@ pub fn build_csv_reader_node(
     let json_column: Vec<Option<String>> = json_column.into_iter().map(Some).collect();
     let json_output = json_column.into_iter().collect::<Option<Vec<String>>>();
     let input_files = df!("col" => &raw_input_files).unwrap();
-    println!("input_files {}",input_files);
+    // println!("input_files {}",input_files);
     /* Modify to create TBL reader or PARQUET reader */
     let reader = match file_format {
         FILE_FORMAT_CSV => CSVReaderBuilder::new()

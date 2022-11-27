@@ -14,7 +14,7 @@ def convert_file_to_json(file_name):
     # df = pl.read_csv(file_name, has_header = False, sep = "|")
     df = pl.read_csv(file_name, has_header = False, sep = "|")
     # print(df[:10])
-    df.write_ndjson(target_file_name)
+    df.write_json(target_file_name,row_oriented = True)
     return target_file_name
 
 if __name__ == "__main__":

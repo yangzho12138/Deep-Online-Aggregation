@@ -21,7 +21,7 @@ def convert_file_to_json(file_name):
         print(f"File {target_file_name} already exists")
         return target_file_name
     df = pl.read_csv(file_name, has_header = False, sep = "|")
-    df.write_json(target_file_name, statistics=True)
+    df.write_ndjson(target_file_name, statistics=True)
     return target_file_name
 if __name__ == "__main__":
     if len(sys.argv) < 2:
