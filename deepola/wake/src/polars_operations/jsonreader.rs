@@ -43,7 +43,6 @@ impl JsonReaderBuilder {
         self.projected_cols = projected_cols;
         self
     }
-
     pub fn build(&self) -> ExecutionNode<DataFrame> {
         let data_processor = JsonReader::new(
             self.column_names.clone(),
@@ -51,36 +50,26 @@ impl JsonReaderBuilder {
         );
         ExecutionNode::<DataFrame>::new(Box::new(data_processor), 1)
     }
+
 }
 
 /// A custom SetProcessor<Series> type for reading parquet files.
 struct JsonReader {
-    infer_schema_len: Option<usize>,
-    batch_size: usize,
-    projection: Option<Vec<String>>,
-    // not sure if needed
-    // schema: Option<ArrowSchema>,
-    // json_format: JsonFormat,
+    column_names: Option<Vec<String>>,
+    projected_cols: Option<Vec<String>>,
 }
 
 /// A factory method for creating the custom SetProcessor<Series> type for
 /// reading parquet files
 impl JsonReader {
     pub fn new(
-        infer_schema_len: Option<usize>,
-        batch_size: usize,
-        projection: Option<Vec<String>>,
-        // not sure if needed
-        // schema: Option<ArrowSchema>,
-        // json_format: JsonFormat,
+        column_names: Option<Vec<String>>,
+        projected_cols: Option<Vec<String>>,
+
     ) -> Self {
         JsonReader {
-            infer_schema_len,
-            batch_size,
-            projection,
-            // not sure if needed
-            schema,
-            json_format,
+            column_names,
+            projected_cols,
         }
     }
 
@@ -89,25 +78,26 @@ impl JsonReader {
         /* Refer to the implementation of `dataframe_from_filename` in `csvreader.rs` */
         log::info!("Begin ReadFile Json: {:?}", SystemTime::now());
         println!("{:?}",SystemTime::now());
-        // need to change
+
         let f = File::open(filename).unwrap();
         let mut reader = polars::prelude::JsonReader::new(f);
-        // if self.projection.is_some() {
-        //     reader = reader.with_projection(self.projection.clone());
-        // }
+        if self.projected_cols.is_some() {
+            reader = reader.with_projection(self.projected_cols.clone());
+        }
         let mut df = reader.finish().unwrap();
 
-        log::info!("End ReadFile Json: {:?}", SystemTime::now());
+        log::info!("End ReadFile Parquet: {:?}", SystemTime::now());
         println!("{:?}",SystemTime::now());
 
-        if self.projection.is_some(){
-            if let Some(a) = &self.projection{
+        if self.column_names.is_some(){
+            if let Some(a) = &self.column_names{
                 df.set_column_names(a).unwrap();
             }
         }
         df
     }
 }
+
 
 impl StreamProcessor<DataFrame> for JsonReader {
     fn process_stream(

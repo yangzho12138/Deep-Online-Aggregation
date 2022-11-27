@@ -196,7 +196,7 @@ pub fn build_csv_reader_node(
             .projected_cols(projected_cols_index)
             .build(),
         FILE_FORMAT_JSON => JsonReaderBuilder::new()
-            .with_projection(projected_cols_names)
+            .column_names(projected_cols_names)
             .projected_cols(projected_cols_index)
             .build(),
         _ => {
